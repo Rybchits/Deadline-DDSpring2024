@@ -44,7 +44,7 @@ async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_
         task_id,
         tag_id,
         'Освобождение от дедлайна #{task_id} {task_title} '
-        'в группе #{tag_id} {tag_title}: {date}',
+        'в тэге #{tag_id} {tag_title}: {date}',
     )
 
     return ConversationHandler.END
