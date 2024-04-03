@@ -1,17 +1,17 @@
 from typing import List
 
 from src.handlers.create.add_task_handler import add_task_builder
-from src.handlers.create.add_group_handler import add_group_builder
-from src.handlers.create.add_user_group_handler import add_user_group_builder
+from src.handlers.create.add_tag_handler import add_tag_builder
+from src.handlers.create.add_user_tag_handler import add_user_tag_builder
 from src.handlers.create.add_user_task_handler import add_user_task_builder
-from src.handlers.create.add_group_task_handler import add_group_task_builder
+from src.handlers.create.add_tag_task_handler import add_tag_task_builder
 
 from src.handlers.create.add_task_done_handler import add_task_done_builder
 
-from src.handlers.delete.delete_group_handler import delete_group_builder
+from src.handlers.delete.delete_tag_handler import delete_tag_builder
 from src.handlers.delete.delete_task_handler import delete_task_builder
-from src.handlers.delete.delete_group_task_handler import delete_group_task_builder
-from src.handlers.delete.delete_user_group_handler import delete_user_group_builder
+from src.handlers.delete.delete_tag_task_handler import delete_tag_task_builder
+from src.handlers.delete.delete_user_tag_handler import delete_user_tag_builder
 from src.handlers.delete.delete_user_task_handler import delete_user_task_builder
 
 from src.handlers.get.get_gantt_diagram_handler import get_gantt_diagram_builder
@@ -43,18 +43,18 @@ def bot_start() -> None:
     
     # Create
     application.add_handler(add_task_builder())
-    application.add_handler(add_group_builder())
-    application.add_handler(add_user_group_builder())
-    application.add_handler(add_group_task_builder())
+    application.add_handler(add_tag_builder())
+    application.add_handler(add_user_tag_builder())
+    application.add_handler(add_tag_task_builder())
     application.add_handler(add_user_task_builder())
     
     application.add_handler(add_task_done_builder())
     
     # Delete
-    application.add_handler(delete_group_builder())
+    application.add_handler(delete_tag_builder())
     application.add_handler(delete_task_builder())
-    application.add_handler(delete_group_task_builder())
-    application.add_handler(delete_user_group_builder())
+    application.add_handler(delete_tag_task_builder())
+    application.add_handler(delete_user_tag_builder())
     application.add_handler(delete_user_task_builder())
     
     # Get
@@ -69,17 +69,17 @@ def bot_start() -> None:
             BotCommand("start", "Начать"),
 
             BotCommand("add_task", "Добавить задачу"),
-            BotCommand("add_group", "Добавить группу"),
-            BotCommand("add_user_group", "Добавить UsersGroups"),
+            BotCommand("add_tag", "Добавить тэг"),
+            BotCommand("add_user_tag", "Добавить UsersTags"),
             BotCommand("add_user_task", "Добавить UsersTasks"),
-            BotCommand("add_group_task", "Добавить GroupsTasks"),
+            BotCommand("add_tag_task", "Добавить TagsTasks"),
 
             BotCommand("do_task", "Выполнить задачу"),
 
-            BotCommand("delete_group", "Удалить группу"),
+            BotCommand("delete_tag", "Удалить тэг"),
             BotCommand("delete_task", "Удалить задачу"),
-            BotCommand("delete_group_task", "Удалить GroupsTasks"),
-            BotCommand("delete_user_group", "Удалить UsersGroups"),
+            BotCommand("delete_tag_task", "Удалить TagsTasks"),
+            BotCommand("delete_user_tag", "Удалить UsersTags"),
             BotCommand("delete_user_task", "Удалить UsersTasks"),
             
             BotCommand("get_gantt_diagram", "Сгенерировать диаграмму Ганта"),

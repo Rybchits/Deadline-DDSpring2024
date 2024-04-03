@@ -6,7 +6,6 @@ import psycopg2.extras
 from telegram.ext import CallbackContext
 
 from src.db.connection import conn
-from src.handlers.bot import BOT
 
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
@@ -70,9 +69,9 @@ async def deadline_notifier(context: CallbackContext):
             SELECT userId FROM UsersTasks
                 WHERE taskId = %(task_id)s and done = FALSE
             UNION
-            (SELECT DISTINCT userId FROM UsersGroups
-                JOIN GroupsTasks ON UsersGroups.groupId = GroupsTasks.groupId
-                WHERE GroupsTasks.taskId = %(task_id)s
+            (SELECT DISTINCT userId FROM UsersTags
+                JOIN TagsTasks ON UsersTags.tagId = TagsTasks.tagId
+                WHERE TagsTasks.taskId = %(task_id)s
             EXCEPT
             SELECT userId FROM UsersTasks
                 WHERE taskId = %(task_id)s and done = TRUE)

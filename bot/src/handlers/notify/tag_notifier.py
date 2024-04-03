@@ -2,17 +2,16 @@ import psycopg2.extras
 from telegram import Bot
 
 from src.db.connection import conn
-from src.handlers.bot import BOT
 
 
-async def group_task_notifier(
-    task_id: int, group_id: int, message: str
+async def tag_task_notifier(
+    task_id: int, tag_id: int, message: str
 ) -> None:
     cur = conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
     cur.execute(
-        "SELECT userId FROM UsersGroups WHERE groupId = %s",
-        (group_id,),
+        "SELECT userId FROM UsersTags WHERE tagId = %s",
+        (tag_id,),
     )
     users = cur.fetchall()
 
@@ -24,18 +23,18 @@ async def group_task_notifier(
     date = date.strftime('%a, %d %b %H:%M')
 
     cur.execute(
-        "SELECT title FROM Groups WHERE id = %s",
-        (group_id,),
+        "SELECT title FROM Tags WHERE id = %s",
+        (tag_id,),
     )
-    group_title = cur.fetchone().title
+    tag_title = cur.fetchone().title
 
     for user in users:
         await BOT.send_message(
             text=message.format(
                 task_id=task_id,
                 task_title=task_title,
-                group_id=group_id,
-                group_title=group_title,
+                tag_id=tag_id,
+                tag_title=tag_title,
                 date=date,
             ),
             chat_id=user.userid,
