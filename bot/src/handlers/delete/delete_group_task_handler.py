@@ -17,8 +17,10 @@ from telegram.ext import (
 from src.handlers.handlers import cancel_callback
 from src.db.connection import conn
 from src.db.helpers import run_sql
+from src.handlers.notify.group_notifier import group_task_notifier
 
 START, DELETE_GROUP_ID, DELETE_TASK_ID = range(3)
+
 
 async def start_delete_group_task_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text("Введите group id:")
@@ -37,6 +39,13 @@ async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_
 
     query = "DELETE FROM GroupsTasks WHERE groupId=%s AND taskId=%s;"
     run_sql(query, (group_id, task_id))
+
+    await group_task_notifier(
+        task_id,
+        group_id,
+        'Освобождение от дедлайна #{task_id} {task_title} '
+        'в группе #{group_id} {group_title}: {date}',
+    )
 
     return ConversationHandler.END
 

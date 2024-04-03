@@ -18,15 +18,16 @@ from src.handlers.handlers import cancel_callback
 from src.db.connection import conn
 from src.db.helpers import run_sql
 
+
 START = range(1)
 
 async def start_get_tasks_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_id = update.message.chat.id
+    user_id = update.message.chat_id
 
-    query = "SELECT * FROM Tasks JOIN UsersTasks ON Tasks.id = UserTasks.taskId WHERE UserTasks.userId=%s;"
-    tasks = run_sql(query, (user_id))
+    query = "SELECT * FROM Tasks JOIN UsersTasks ON Tasks.id = UsersTasks.taskId WHERE UsersTasks.userId=%s;"
+    tasks = run_sql(query, (user_id,))
 
-    await update.message.reply_text(tasks)
+    await update.message.reply_text(str(tasks))
 
     return ConversationHandler.END
 
