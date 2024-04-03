@@ -16,7 +16,7 @@ START, ADD_TASK_ID = range(2)
 async def start_add_task_done_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
-    await update.message.reply_text("Введите task id")
+    await update.message.reply_text("Введите название задачи:")
 
     return ADD_TASK_ID
 
@@ -25,8 +25,16 @@ async def add_task_id_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
     user_id = update.message.chat_id
-    task_id = update.message.text
+    task_name = update.message.text
 
+    query = "SELECT id from Tasks WHERE title=%s;"
+    result = run_sql(query, (task_name,))
+
+    if not result:
+        await update.message.reply_text("Введенная задача не существует.")
+        return ConversationHandler.END
+
+    task_id = result[0][0]
     query = (
         'INSERT INTO UsersTasks (userId, taskId, done) '
         'values (%s, %s, TRUE) ON CONFLICT (userId, taskId) DO '
@@ -34,7 +42,7 @@ async def add_task_id_callback(
     )
     run_sql(query, (user_id, task_id))
 
-    await update.message.reply_text(f"Задача #{task_id} выполнена")
+    await update.message.reply_text(f"Задача {task_name} выполнена!")
 
     return ConversationHandler.END
 

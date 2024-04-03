@@ -2,7 +2,7 @@ import psycopg2.extras
 from telegram import Bot
 
 from src.db.connection import conn
-
+from src.handlers.bot import BOT
 
 async def tag_task_notifier(
     task_id: int, tag_id: int, message: str

@@ -24,10 +24,18 @@ START = range(1)
 async def start_get_tasks_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.message.chat_id
 
-    query = "SELECT * FROM Tasks JOIN UsersTasks ON Tasks.id = UsersTasks.taskId WHERE UsersTasks.userId=%s;"
-    tasks = run_sql(query, (user_id,))
+    query = "SELECT Tasks.title, Tasks.start, Tasks.finish FROM Tasks JOIN UsersTasks ON Tasks.id = UsersTasks.taskId WHERE UsersTasks.userId=%s UNION (select Tasks.title, Tasks.start, Tasks.finish from tagstasks join userstags on tagstasks.tagid=userstags.tagid join tasks on tasks.id=tagstasks.taskid where userstags.userid=%s);"
+    tasks = run_sql(query, (user_id, user_id))
 
-    await update.message.reply_text(str(tasks))
+    if not tasks:
+        await update.message.reply_text("У вас нет активных задач.")
+        return ConversationHandler.END
+
+    result = "Список ваших задач:"
+    for id, task in enumerate(tasks):
+        result += f'\n{id + 1}. Задача {task[0]}. Началась {task[1]}. Дедлайн {task[2]}\n'
+
+    await update.message.reply_text(result)
 
     return ConversationHandler.END
 

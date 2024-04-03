@@ -6,7 +6,7 @@ import psycopg2.extras
 from telegram.ext import CallbackContext
 
 from src.db.connection import conn
-
+from src.handlers.bot import BOT
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
