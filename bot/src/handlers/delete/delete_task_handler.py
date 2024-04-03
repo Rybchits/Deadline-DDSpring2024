@@ -21,15 +21,15 @@ from src.db.helpers import run_sql
 START, DELETE_TASK_TITLE = range(2)
 
 async def start_delete_task_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("Введите название задачи:")
+    await update.message.reply_text("Введите id задачи:")
 
     return DELETE_TASK_TITLE 
 
 async def delete_task_title_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    title = update.message.text
+    task_id = update.message.text
 
-    query = "DELETE FROM TASKS WHERE TITLE=%s;"
-    run_sql(query, (title))
+    query = "DELETE FROM TASKS WHERE id=%s;"
+    run_sql(query, (task_id))
     
     return ConversationHandler.END
 

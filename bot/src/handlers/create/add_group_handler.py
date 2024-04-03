@@ -28,9 +28,11 @@ async def start_add_group_callback(update: Update, context: ContextTypes.DEFAULT
 async def add_group_title_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     title = update.message.text
 
-    query = "INSERT INTO groups(title) values (%s);"
-    run_sql(query, (title))
+    query = "INSERT INTO groups(title) values (%s) RETURNING id;"
+    group_id = run_sql(query, (title,))[0][0]
     
+    await update.message.reply_text(f'Создана группа #{group_id}')
+
     return ConversationHandler.END
 
 def add_group_builder() -> ConversationHandler:

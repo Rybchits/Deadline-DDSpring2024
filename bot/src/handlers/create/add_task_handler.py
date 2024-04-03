@@ -43,8 +43,12 @@ async def add_task_end_date_callback(update: Update, context: ContextTypes.DEFAU
     context.user_data["FINISH"] = update.message.text
 
     task = context.user_data
-    query = "INSERT INTO tasks(title, start, finish) values (%s, %s, %s);"
-    run_sql(query, (task["TITLE"], task["START"], task["FINISH"]))
+    query = "INSERT INTO tasks(title, start, finish) values (%s, %s, %s) RETURNING id;"
+    task_id = run_sql(
+        query, (task["TITLE"], task["START"], task["FINISH"])
+    )[0][0]
+
+    await update.message.reply_text(f'Создана задача #{task_id}')
 
     return ConversationHandler.END
 
