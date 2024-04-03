@@ -21,6 +21,15 @@ from src.db.helpers import run_sql
 START, DELETE_TAG_TITLE = range(2)
 
 async def start_delete_tag_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = str(update.message.chat_id)
+
+    query = "SELECT role from Users WHERE userId=%s;"
+    result = run_sql(query, (user_id,))
+
+    if not result or result[0][0] != 'admin':
+        await update.message.reply_text("Вы не можете удалять тэги.")
+        return ConversationHandler.END
+    
     await update.message.reply_text("Введите id тэга:")
 
     return DELETE_TAG_TITLE

@@ -23,6 +23,15 @@ START, DELETE_TAG_ID, DELETE_TASK_ID = range(3)
 
 
 async def start_delete_tag_task_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = str(update.message.chat_id)
+
+    query = "SELECT role from Users WHERE userId=%s;"
+    result = run_sql(query, (user_id,))
+
+    if not result or result[0][0] != 'admin':
+        await update.message.reply_text("Вы не можете удалять задачи из тэгов.")
+        return ConversationHandler.END
+    
     await update.message.reply_text("Введите tag id:")
 
     return DELETE_TAG_ID

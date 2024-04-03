@@ -23,6 +23,15 @@ from src.handlers.notify.tag_notifier import tag_task_notifier
 START, ADD_TAG_ID, ADD_TASK_ID = range(3)
 
 async def start_add_tag_task_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = str(update.message.chat_id)
+
+    query = "SELECT role from Users WHERE userId=%s;"
+    result = run_sql(query, (user_id,))
+
+    if not result or result[0][0] != 'admin':
+        await update.message.reply_text("Вы не можете добавлять задачи в тэги.")
+        return ConversationHandler.END
+
     await update.message.reply_text("Введите tag id:")
 
     return ADD_TAG_ID
