@@ -34,10 +34,11 @@ async def add_task_name_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def add_task_end_date_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = update.callback_query.from_user.id
     selected,date = await process_calendar_selection(update, context)
     # TODO добавить проверку, что дата окончания не старше даты начала
     if selected:
-        await context.bot.send_message(chat_id=update.callback_query.from_user.id,
+        await context.bot.send_message(chat_id=user_id,
                         text=f"Дата окончания выбрана: {date.strftime("%d/%m/%Y")}",
                         reply_markup=ReplyKeyboardRemove())
         
@@ -45,12 +46,13 @@ async def add_task_end_date_callback(update: Update, context: ContextTypes.DEFAU
 
     task = context.user_data
     insert_query = "INSERT INTO tasks(title, start, finish) values (%s, %s, %s) RETURNING id;"
-    task_id = run_sql(
-        insert_query, (task["TITLE"], task["START"], task["FINISH"])
-    )[0][0]
+    task_id = run_sql(insert_query, (task["TITLE"], task["START"], task["FINISH"]))[0][0]
+
+    insert_link_query = "INSERT INTO userstasks(userid, taskid) values (%s, %s)"
+    run_sql(insert_link_query, (user_id, task_id))
 
     await context.bot.send_message(
-        chat_id=update.callback_query.from_user.id, 
+        chat_id=user_id, 
         text=f'Создана задача {task["TITLE"]} с идентификатором {task_id}')
     
     return ConversationHandler.END
