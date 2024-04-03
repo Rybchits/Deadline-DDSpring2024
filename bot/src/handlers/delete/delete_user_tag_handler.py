@@ -42,7 +42,7 @@ async def delete_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_T
     query = "DELETE FROM UsersTags WHERE userId=%s AND tagId=%s;"
     run_sql(query, (user_id, tag_id))
 
-    await update.message.reply_text(f'Вы успешно отписались от тэга {tag_name}')
+    await update.message.reply_text(f'Вы успешно отписались от тэга {tag_name}!')
 
     return ConversationHandler.END
 

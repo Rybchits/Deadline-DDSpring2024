@@ -21,7 +21,7 @@ from src.db.helpers import run_sql
 START, ADD_TASK_NAME, ADD_TASK_START_DATE, ADD_TASK_END_DATE = range(4)
 
 async def start_add_task_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("Введите название задачи")
+    await update.message.reply_text("Введите название задачи:")
 
     return ADD_TASK_NAME
 
@@ -48,7 +48,7 @@ async def add_task_end_date_callback(update: Update, context: ContextTypes.DEFAU
         query, (task["TITLE"], task["START"], task["FINISH"])
     )[0][0]
 
-    await update.message.reply_text(f'Создана задача #{task_id}')
+    await update.message.reply_text(f'Создана задача {task["TITLE"]}')
 
     return ConversationHandler.END
 

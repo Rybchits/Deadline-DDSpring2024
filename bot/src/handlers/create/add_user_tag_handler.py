@@ -43,7 +43,7 @@ async def add_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     query = "INSERT INTO UsersTags(userId, tagId) values (%s, %s);"
     run_sql(query, (user_id, tag_id))
 
-    await update.message.reply_text(f'Вы успешно подписались на тэг {tag_name}')
+    await update.message.reply_text(f'Вы успешно подписались на тэг {tag_name}!')
 
     return ConversationHandler.END
 

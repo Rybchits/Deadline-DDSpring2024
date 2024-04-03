@@ -71,7 +71,7 @@ def bot_start() -> None:
             BotCommand("add_task", "Добавить задачу"),
             BotCommand("add_tag", "Добавить тэг"),
             BotCommand("tag_subscribe", "Подписаться на тэг"),
-            BotCommand("add_user_task", "Добавить UsersTasks"),
+            BotCommand("task_subscribe", "Подписаться на задачу"),
             BotCommand("add_tag_task", "Добавить TagsTasks"),
 
             BotCommand("do_task", "Выполнить задачу"),
@@ -80,7 +80,7 @@ def bot_start() -> None:
             BotCommand("delete_task", "Удалить задачу"),
             BotCommand("delete_tag_task", "Удалить TagsTasks"),
             BotCommand("tag_unsubscribe", "Отписаться от тэга"),
-            BotCommand("delete_user_task", "Удалить UsersTasks"),
+            BotCommand("task_unsubscribe", "Описаться от задачи"),
             
             BotCommand("get_gantt_diagram", "Сгенерировать диаграмму Ганта"),
             BotCommand("get_tasks", "Получить все задачи"),
