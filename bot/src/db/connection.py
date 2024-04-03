@@ -6,9 +6,9 @@ load_dotenv()
 
 password = os.getenv("PSQL_PASSWORD")
 conn = psycopg2.connect(
-    host="rc1b-xilltfvey34cs1tc.mdb.yandexcloud.net",
-    database="notificator",
-    user="notificator",
+    host="178.154.202.11",
+    database="deadline-db",
+    user="admin",
     password=password,
-    port="6432"
+    port="5432"
 )
