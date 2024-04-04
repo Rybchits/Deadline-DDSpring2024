@@ -56,7 +56,7 @@ async def add_task_end_date_callback(update: Update, context: ContextTypes.DEFAU
     task = context.user_data
     insert_query = """
         WITH newtask AS (
-            INSERT INTO tasks(title, start, finish) values ($1, $2, $3)
+            INSERT INTO tasks(title, description, start, finish) values ($1, 'default', $2, $3)
             RETURNING id
         )
         INSERT INTO userstasks(userid, taskid) SELECT $4, newtask.id FROM newtask
