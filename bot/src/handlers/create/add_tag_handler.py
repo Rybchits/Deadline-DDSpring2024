@@ -1,9 +1,5 @@
-from datetime import datetime
-import asyncio
 from telegram import (
     Update,
-    ReplyKeyboardMarkup,
-    KeyboardButton
 )
 
 from telegram.ext import (
@@ -15,7 +11,6 @@ from telegram.ext import (
 )
 
 from src.handlers.handlers import cancel_callback
-from src.db.connection import conn
 from src.db.helpers import async_sql
 
 START, ADD_TAG_NAME = range(2)

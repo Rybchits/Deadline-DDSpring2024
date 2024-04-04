@@ -93,8 +93,6 @@ async def deadline_notifier(context: CallbackContext):
                 """)
 
         for rec in recs:
-            print(rec)
-
             ind = rec['notified'] - 1
             message = (
                 f'{random.choice(NOTIFICATIONS[ind][1])} '

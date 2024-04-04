@@ -25,8 +25,6 @@ async def async_sql(sql, data=None):
     args = data or ()
     recs = None
 
-    print(sql, "|", *args)
-
     try:
         async with POOL[0].acquire() as conn:
             async with conn.transaction():

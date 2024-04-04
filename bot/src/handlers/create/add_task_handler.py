@@ -28,20 +28,29 @@ async def start_add_task_callback(update: Update, context: ContextTypes.DEFAULT_
 async def add_task_name_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["TITLE"] = update.message.text
 
-    await update.effective_message.reply_text("Введите дату начала задачи\t\t\t", reply_markup=create_calendar())
+    context.user_data["START"] = datetime.now()
+
+    await update.effective_message.reply_text(text="Введите дату окончания задачи\t\t\t", reply_markup=create_calendar())
     
-    return ADD_TASK_START_DATE
+    return ADD_TASK_END_DATE
 
 
 async def add_task_end_date_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.callback_query.from_user.id
-    selected,date = await process_calendar_selection(update, context)
-    # TODO добавить проверку, что дата окончания не старше даты начала
+    selected, date = await process_calendar_selection(update, context)
+
     if selected:
         await context.bot.send_message(chat_id=user_id,
                         text=f"Дата окончания выбрана: {date.strftime("%d/%m/%Y")}",
                         reply_markup=ReplyKeyboardRemove())
-        
+
+    if date < context.user_data["START"]:
+        await context.bot.send_message(
+            chat_id=user_id,
+            text='Вы не можете решить задачу в прошлом, '
+                 'постарайтесь жить сейчас и думать о будущем')
+        return ConversationHandler.END
+
     context.user_data["FINISH"] = date
 
     task = context.user_data
