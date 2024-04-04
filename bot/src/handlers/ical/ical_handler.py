@@ -24,7 +24,7 @@ async def start_get_ical_callback(update: Update, context: ContextTypes.DEFAULT_
         return ConversationHandler.END
 
     ical_request_data = {
-        "name": user_id,
+        "name": str(user_id),
         "tasks": [{
             "id": task[0],
             "title": task[1],
@@ -33,11 +33,14 @@ async def start_get_ical_callback(update: Update, context: ContextTypes.DEFAULT_
             "description": task[4]
         } for task in tasks]
     }
+
+    print(ical_request_data)
     
     response = requests.post("http://localhost:8082/ical", json=ical_request_data)
     if response.status_code == 200:
         await context.bot.send_document(user_id, document=open(f'./ical/calendars/{user_id}.ics', 'rb'))
     else:
+        print(response.status_code)
         await update.message.reply_text("Не удалось получить данные с сервера.")
 
     return ConversationHandler.END
