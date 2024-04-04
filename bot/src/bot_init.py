@@ -100,6 +100,8 @@ def bot_start() -> None:
 
             BotCommand("get_gantt_diagram", "Сгенерировать диаграмму Ганта"),
             BotCommand("get_tasks", "Получить все задачи"),
+
+            BotCommand("get_ical", "Создать календарь"),
         ]
     )
 
