@@ -1,3 +1,18 @@
+from telegram import Update
+
+from telegram.ext import (
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    ConversationHandler,
+    filters,
+)
+
+from src.handlers.handlers import cancel_callback
+from src.db.helpers import async_sql
+
+START = range(1)
+
 async def start_get_ical_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_id = update.message.chat_id
 
@@ -32,7 +47,7 @@ def get_ical_builder() -> ConversationHandler:
         entry_points=[CommandHandler("get_ical", start_get_ical_callback)],
         states={
             START: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, start_get_tasks_callback)
+                MessageHandler(filters.TEXT & ~filters.COMMAND, start_get_ical_callback)
             ],
         },
         fallbacks=[CommandHandler("cancel", cancel_callback)]

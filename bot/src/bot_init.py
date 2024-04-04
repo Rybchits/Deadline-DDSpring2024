@@ -18,6 +18,7 @@ from src.handlers.delete.delete_user_task_handler import delete_user_task_builde
 
 from src.handlers.get.get_gantt_diagram_handler import get_gantt_diagram_builder
 from src.handlers.get.get_tasks_handler import get_tasks_builder
+from src.handlers.ical.ical_handler import get_ical_builder
 
 from src.handlers.notify.deadline_notifier import deadline_notifier
 
