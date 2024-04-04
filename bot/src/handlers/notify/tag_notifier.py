@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from src.db.connection import POOL
 from src.handlers.bot import BOT
 
@@ -7,15 +9,21 @@ async def tag_task_notifier(
 ) -> None:
     async with POOL[0].acquire() as conn:
         async with conn.transaction():
-            users = await conn.fetch(
-                f"SELECT userId FROM UsersTags WHERE tagId = {tag_id}",
-            )
-
             res = await conn.fetch(
                 f"SELECT title, finish FROM Tasks WHERE id = {task_id}",
             )
             task_title, date = res[0]["title"], res[0]["finish"]
-            date = date.strftime('%a, %d %b %H:%M')
+            date = date.astimezone().strftime('%a, %d %b %H:%M')
+
+            if date < datetime.now():
+                return
+
+            users = await conn.fetch(f"""
+                SELECT userId FROM UsersTags
+                    LEFT JOIN UsersTasks
+                        ON UsersTasks.userId = UsersTags.userId
+                    WHERE tagId = {tag_id} and UsersTasks.done != TRUE
+            """)
 
             res = await conn.fetch(
                 f"SELECT title FROM Tags WHERE id = {tag_id}",

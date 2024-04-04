@@ -3,15 +3,16 @@ from src.db.connection import conn, POOL
 
 def run_sql(sql, data=None):
     cur = conn.cursor()
+    result = None
 
     try:
         cur.execute(sql, data or ())
     except Exception as e:
         conn.commit()
         print(e)
-        return None
+        return result
 
-    try: 
+    try:
         result = cur.fetchall()
     except Exception as e:
         print(e)
