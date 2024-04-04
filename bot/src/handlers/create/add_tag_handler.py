@@ -25,16 +25,16 @@ async def add_tag_title_callback(update: Update, context: ContextTypes.DEFAULT_T
     user_id = update.message.chat_id
     title = update.message.text
 
-    insert_tag_query = """
+    insert_tag_query = f"""
         WITH newtag AS (
-            INSERT INTO tags(title) values ($1) RETURNING id
+            INSERT INTO tags(title) values ('{title}') RETURNING id
         )
         INSERT INTO userstags(userid, tagid, is_admin)
-            SELECT $2, newtag.id, True FROM newtag
+            SELECT {user_id}, newtag.id, True FROM newtag
         RETURNING tagid;
     """
 
-    tag_id = await async_sql(insert_tag_query, (title, user_id))
+    tag_id = await async_sql(insert_tag_query)
     tag_id = tag_id[0]['tagid']
 
     await update.message.reply_text(f'Создан тэг {title} с идентификатором {tag_id}')

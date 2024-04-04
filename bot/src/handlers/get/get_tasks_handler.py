@@ -24,7 +24,7 @@ async def start_get_tasks_callback(update: Update, context: ContextTypes.DEFAULT
                     FROM Tasks
                     JOIN UsersTasks
                         ON Tasks.id = UsersTasks.taskId
-                    WHERE UsersTasks.userId = %s
+                    WHERE UsersTasks.userId = $1
                 UNION
                 SELECT Tasks.title, Tasks.start, Tasks.finish, Tasks.id
                     FROM TagsTasks
@@ -32,7 +32,7 @@ async def start_get_tasks_callback(update: Update, context: ContextTypes.DEFAULT
                         ON TagsTasks.tagid = UsersTags.tagid
                     JOIN Tasks
                         ON Tasks.id = TagsTasks.taskid
-                WHERE UsersTags.userid = %s
+                WHERE UsersTags.userid = $2
             ) t
             LEFT JOIN UsersTasks ON UsersTasks.taskId = t.id
             WHERE UsersTasks.done != True
