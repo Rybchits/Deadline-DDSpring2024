@@ -16,7 +16,7 @@ from telegram.ext import (
 from src.calendar import create_calendar, process_calendar_selection
 
 from src.handlers.handlers import cancel_callback
-from src.db.helpers import run_sql
+from src.db.helpers import async_sql
 
 START, ADD_TASK_NAME, ADD_TASK_START_DATE, ADD_TASK_END_DATE = range(4)
 
@@ -45,14 +45,20 @@ async def add_task_end_date_callback(update: Update, context: ContextTypes.DEFAU
     context.user_data["FINISH"] = date
 
     task = context.user_data
-    insert_query = "INSERT INTO tasks(title, start, finish) values (%s, %s, %s) RETURNING id;"
-    task_id = run_sql(insert_query, (task["TITLE"], task["START"], task["FINISH"]))[0][0]
+    insert_query = """
+        WITH newtask AS (
+            INSERT INTO tasks(title, start, finish) values ($1, $2, $3)
+            RETURNING id
+        )
+        INSERT INTO userstasks(userid, taskid) SELECT $4, newtask.id FROM newtask
+        RETURNING taskid;
+    """
 
-    insert_link_query = "INSERT INTO userstasks(userid, taskid) values (%s, %s)"
-    run_sql(insert_link_query, (user_id, task_id))
+    task_id = await async_sql(insert_query, (task["TITLE"], task["START"], task["FINISH"], user_id))
+    task_id = task_id[0]['taskid']
 
     await context.bot.send_message(
-        chat_id=user_id, 
+        chat_id=user_id,
         text=f'Создана задача {task["TITLE"]} с идентификатором {task_id}')
     
     return ConversationHandler.END

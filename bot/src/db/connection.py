@@ -4,11 +4,18 @@ import os
 
 load_dotenv()
 
-password = os.getenv("PSQL_PASSWORD")
+HOST = "178.154.202.11"
+DATABASE = "deadline-db"
+USER = "admin"
+PASSWORD = os.getenv("PSQL_PASSWORD")
+PORT = "5432"
+
 conn = psycopg2.connect(
-    host="178.154.202.11",
-    database="deadline-db",
-    user="admin",
-    password=password,
-    port="5432"
+    host=HOST,
+    database=DATABASE,
+    user=USER,
+    password=PASSWORD,
+    port=PORT
 )
+
+POOL = [None] # sets in application init

@@ -16,7 +16,7 @@ from telegram.ext import (
 
 from src.handlers.handlers import cancel_callback
 from src.db.connection import conn
-from src.db.helpers import run_sql
+from src.db.helpers import async_sql
 
 START, ADD_TAG_NAME = range(2)
 
@@ -27,17 +27,22 @@ async def start_add_tag_callback(update: Update, context: ContextTypes.DEFAULT_T
 # Каждый user, который добавляет тег становится его админом
 # Добавляем в таблицы tags и userstags
 async def add_tag_title_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = update.message.chat_id
     title = update.message.text
 
-    insert_tag_query = "INSERT INTO tags(title) values (%s) RETURNING id;"
+    insert_tag_query = """
+        WITH newtag AS (
+            INSERT INTO tags(title) values ($1) RETURNING id
+        )
+        INSERT INTO userstags(userid, tagid, is_admin)
+            SELECT $2, newtag.id, True FROM newtag
+        RETURNING tagid;
+    """
 
-    tag_id = run_sql(insert_tag_query, (title,))[0][0]
-    user_id = str(update.message.chat_id)
+    tag_id = await async_sql(insert_tag_query, (title, user_id))
+    tag_id = tag_id[0]['tagid']
 
-    insert_link_user_to_tag_query = "INSERT INTO userstags(userid, tagid, is_admin) values (%s, %s, %s);"
-    run_sql(insert_link_user_to_tag_query, (user_id, tag_id, True))
-    
-    await update.message.reply_text(f'Создан тэг {title}')
+    await update.message.reply_text(f'Создан тэг {title} с идентификатором {tag_id}')
 
     return ConversationHandler.END
 

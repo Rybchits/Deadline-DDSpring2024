@@ -16,7 +16,7 @@ from telegram.ext import (
 
 from src.handlers.handlers import cancel_callback
 from src.db.connection import conn
-from src.db.helpers import run_sql
+from src.db.helpers import async_sql
 from src.handlers.notify.tag_notifier import tag_task_notifier
 
 
@@ -28,14 +28,17 @@ async def start_add_tag_task_callback(update: Update, context: ContextTypes.DEFA
     return ADD_TAG_ID
 
 async def add_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_id = str(update.message.chat_id)
+    tag_id = update.message.text
+    user_id = update.message.chat_id
 
-    query = "SELECT is_admin from usertags WHERE userId=%s;"
-    result = run_sql(query, (user_id,))
+    context.user_data["TAG_ID"] = tag_id
+
+    query = f"SELECT is_admin from userstags WHERE userId={user_id} and tagId={tag_id};"
+    result = await async_sql(query)
     print(result)
 
-    if not result or result[0][0]:
-        await update.message.reply_text("Вы не можете добавлять этот дедайн в этот тег. Вы не являетесь его админом тега")
+    if not result or not result[0][0]:
+        await update.message.reply_text("Вы не можете добавлять этот дедайн в этот тег. Вы не являетесь его админом")
         return ConversationHandler.END
     
     await update.message.reply_text("Введите task id:")
@@ -46,16 +49,18 @@ async def add_task_id_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     task_id = update.message.text
     tag_id = context.user_data["TAG_ID"]
 
-    check_task_query = "SELECT * from tasks WHERE taskId=%s;"
-    result = run_sql(check_task_query, (task_id,))
+    # TODO: move into transaction
+
+    check_task_query = f"SELECT * from tasks WHERE id={task_id};"
+    result = await async_sql(check_task_query)
     print(result)
 
     if not result:
         await update.message.reply_text("Дедлайна с таким id нет")
         return ConversationHandler.END
 
-    insert_query = "INSERT INTO TagsTasks(tagId, taskId) values (%s, %s);"
-    run_sql(insert_query, (tag_id, task_id))
+    insert_query = f"INSERT INTO TagsTasks(tagId, taskId) values ({tag_id}, {task_id});"
+    await async_sql(insert_query)
 
     await tag_task_notifier(
         task_id,

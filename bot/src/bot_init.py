@@ -1,5 +1,7 @@
 from typing import List
 
+import asyncpg
+
 from src.handlers.create.add_task_handler import add_task_builder
 from src.handlers.create.add_tag_handler import add_tag_builder
 from src.handlers.create.add_user_tag_handler import add_user_tag_builder
@@ -28,6 +30,7 @@ from telegram.ext import (
 
 from src.handlers.handlers import *
 from src.data_init import TOKEN
+from src.db.connection import *
 from src.models import *
 
 import asyncio
@@ -36,27 +39,37 @@ import asyncio
 SECS_PER_NOTIFIER = 10
 
 
+async def init_pool(app):
+    POOL[0] = await asyncpg.create_pool(
+        host=HOST,
+        database=DATABASE,
+        user=USER,
+        password=PASSWORD,
+        port=PORT
+    )
+
+
 def bot_start() -> None:
     application = Application.builder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start_callback))
-    
+
     # Create
     application.add_handler(add_task_builder())
     application.add_handler(add_tag_builder())
     application.add_handler(add_user_tag_builder())
     application.add_handler(add_tag_task_builder())
     application.add_handler(add_user_task_builder())
-    
+
     application.add_handler(add_task_done_builder())
-    
+
     # Delete
     application.add_handler(delete_tag_builder())
     application.add_handler(delete_task_builder())
     application.add_handler(delete_tag_task_builder())
     application.add_handler(delete_user_tag_builder())
     application.add_handler(delete_user_task_builder())
-    
+
     # Get
     application.add_handler(get_gantt_diagram_builder())
     application.add_handler(get_tasks_builder())
@@ -81,11 +94,13 @@ def bot_start() -> None:
             BotCommand("delete_tag_task", "Удалить TagsTasks"),
             BotCommand("tag_unsubscribe", "Отписаться от тэга"),
             BotCommand("task_unsubscribe", "Описаться от задачи"),
-            
+
             BotCommand("get_gantt_diagram", "Сгенерировать диаграмму Ганта"),
             BotCommand("get_tasks", "Получить все задачи"),
         ]
     )
+
+    application.post_init = init_pool
 
     application.run_polling()
 
