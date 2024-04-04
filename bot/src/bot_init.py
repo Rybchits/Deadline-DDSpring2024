@@ -74,6 +74,8 @@ def bot_start() -> None:
     application.add_handler(get_gantt_diagram_builder())
     application.add_handler(get_tasks_builder())
 
+    application.add_handler(get_ical_builder())
+
     application.job_queue.run_repeating(deadline_notifier, SECS_PER_NOTIFIER, 1)
 
     __init_commands(
