@@ -8,7 +8,7 @@ from telegram.ext import (
 )
 
 from src.handlers.handlers import cancel_callback
-from src.db.helpers import run_sql
+from src.db.helpers import async_sql
 
 START, ADD_TASK_ID = range(2)
 
@@ -27,8 +27,8 @@ async def add_task_id_callback(
     user_id = update.message.chat_id
     task_name = update.message.text
 
-    query = "SELECT id from Tasks WHERE title=%s;"
-    result = run_sql(query, (task_name,))
+    query = "SELECT id from Tasks WHERE title=$1;"
+    result = await async_sql(query, (task_name,))
 
     if not result:
         await update.message.reply_text("Введенная задача не существует.")
@@ -37,10 +37,10 @@ async def add_task_id_callback(
     task_id = result[0][0]
     query = (
         'INSERT INTO UsersTasks (userId, taskId, done) '
-        'values (%s, %s, TRUE) ON CONFLICT (userId, taskId) DO '
+        'values ($1, $2, TRUE) ON CONFLICT (userId, taskId) DO '
         'UPDATE SET done = TRUE'
     )
-    run_sql(query, (user_id, task_id))
+    await async_sql(query, (user_id, task_id))
 
     await update.message.reply_text(f"Задача {task_name} выполнена!")
 
