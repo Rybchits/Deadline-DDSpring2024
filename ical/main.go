@@ -96,6 +96,8 @@ func makeCalendar(r icalReq) error {
 		if err != nil {
 			return errBadTimeFormat{format: task.End}
 		}
+		start = start.Add(-time.Hour * 3)
+		end = end.Add(-time.Hour * 3)
 		e.SetCreatedTime(start)
 		e.SetStartAt(start)
 		e.SetModifiedAt(time.Now())
