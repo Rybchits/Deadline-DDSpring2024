@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	ics "github.com/arran4/golang-ical"
 	"io"
@@ -20,12 +21,20 @@ const (
 type icalReq struct {
 	Name  string `json:"name"`
 	Tasks []struct {
-		ID          int       `json:"id"`
-		Title       string    `json:"title"`
-		Start       time.Time `json:"start"`
-		End         time.Time `json:"end"`
-		Description string    `json:"description"`
+		ID          int    `json:"id"`
+		Title       string `json:"title"`
+		Start       string `json:"start"`
+		End         string `json:"end"`
+		Description string `json:"description"`
 	} `json:"tasks"`
+}
+
+type errBadTimeFormat struct {
+	format string
+}
+
+func (e errBadTimeFormat) Error() string {
+	return fmt.Sprintf("bad time format: %s", e.format)
 }
 
 func main() {
@@ -54,7 +63,11 @@ func main() {
 
 		err = makeCalendar(icalReq)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			status := http.StatusInternalServerError
+			if errors.As(err, &errBadTimeFormat{}) {
+				status = http.StatusBadRequest
+			}
+			w.WriteHeader(status)
 			w.Write([]byte(err.Error()))
 			return
 		}
@@ -75,10 +88,18 @@ func makeCalendar(r icalReq) error {
 
 	for _, task := range r.Tasks {
 		e := cal.AddEvent(strconv.Itoa(task.ID))
-		e.SetCreatedTime(task.Start)
-		e.SetStartAt(task.Start)
+		start, err := time.Parse("2006-01-02 15:04:05", task.Start)
+		if err != nil {
+			return errBadTimeFormat{format: task.Start}
+		}
+		end, err := time.Parse("2006-01-02 15:04:05", task.End)
+		if err != nil {
+			return errBadTimeFormat{format: task.End}
+		}
+		e.SetCreatedTime(start)
+		e.SetStartAt(start)
 		e.SetModifiedAt(time.Now())
-		e.SetEndAt(task.End)
+		e.SetEndAt(end)
 		e.SetSummary(task.Title)
 		e.SetDescription(task.Description)
 	}
