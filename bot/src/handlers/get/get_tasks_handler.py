@@ -14,7 +14,10 @@ from src.db.helpers import async_sql
 
 START = range(1)
 
-async def start_get_tasks_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+
+async def start_get_tasks_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
     user_id = update.message.chat_id
 
     query = """
@@ -47,9 +50,9 @@ async def start_get_tasks_callback(update: Update, context: ContextTypes.DEFAULT
     result = "Список ваших задач:\n"
     for id, task in enumerate(tasks):
         result += (
-            f'\n{id + 1}. Задача #{task[3]} {task[0]}\n'
-            f'Начало: {task[1].astimezone().strftime('%d/%m/%Y, %H:%M')}\n'
-            f'Конец: {task[2].astimezone().strftime('%d/%m/%Y, %H:%M')}\n'
+            f"\n{id + 1}. Задача #{task[3]} {task[0]}\n"
+            f"Начало: {task[1].astimezone().strftime('%d/%m/%Y, %H:%M')}\n"
+            f"Конец: {task[2].astimezone().strftime('%d/%m/%Y, %H:%M')}\n"
         )
     await update.message.reply_text(result)
 
@@ -61,8 +64,10 @@ def get_tasks_builder() -> ConversationHandler:
         entry_points=[CommandHandler("get_tasks", start_get_tasks_callback)],
         states={
             START: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, start_get_tasks_callback)
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND, start_get_tasks_callback
+                )
             ],
         },
-        fallbacks=[CommandHandler("cancel", cancel_callback)]
+        fallbacks=[CommandHandler("cancel", cancel_callback)],
     )

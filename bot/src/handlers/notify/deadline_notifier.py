@@ -8,7 +8,7 @@ from src.handlers.bot import BOT
 from src.db.connection import POOL
 
 
-locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+locale.setlocale(locale.LC_ALL, "ru_RU.UTF-8")
 
 
 NOTIFICATIONS = sorted(
@@ -21,7 +21,7 @@ NOTIFICATIONS = sorted(
                 "Дедлайн близко...",
                 "Gentle ping!",
             ],
-            'Осталось меньше дня'
+            "Осталось меньше дня",
         ),
         (
             timedelta(0, 3600),  # 1 hour
@@ -31,26 +31,27 @@ NOTIFICATIONS = sorted(
                 "Дедлайн пришел!",
                 "PI-PI-PING!",
             ],
-            'Осталось меньше часа'
+            "Осталось меньше часа",
         ),
     ],
     key=lambda x: x[0],
-    reverse=True
+    reverse=True,
 )
 
-COUNT_NOTIFICATIONS = '(' + "(finish < '{}'::timestamptz)::int".join(' + ') + ')'
+COUNT_NOTIFICATIONS = "(" + "(finish < '{}'::timestamptz)::int".join(" + ") + ")"
 BITMASK = f"B'{'1' * 8}'::bit(8)"
 
 
 async def deadline_notifier(context: CallbackContext):
     async with POOL[0].acquire() as conn:
-        now = datetime.now()
+        now = datetime.now().astimezone()
         max_past = now + NOTIFICATIONS[0][0]
         dates = [str(now + ns[0]) for ns in NOTIFICATIONS]
         count_notifications = COUNT_NOTIFICATIONS.format(*dates)
 
         async with conn.transaction():
-            recs = await conn.fetch(f"""
+            recs = await conn.fetch(
+                f"""
                 WITH
                 Prev AS (
                     SELECT id, notified as prevNotified FROM Tasks
@@ -90,15 +91,16 @@ async def deadline_notifier(context: CallbackContext):
                              GREATEST(UsersTags.userId, UsersTasks.userId)
                     HAVING GREATEST(UsersTags.userId, UsersTasks.userId) IS
                         NOT NULL
-                """)
-
-        for rec in recs:
-            ind = rec['notified'] - 1
-            message = (
-                f'{random.choice(NOTIFICATIONS[ind][1])} '
-                f'{NOTIFICATIONS[ind][2]}\n'
-                f'#{rec['taskid']} {rec['title']}: '
-                f'{rec['finish'].astimezone().strftime('%a, %d %b %H:%M')}'
+                """
             )
 
-            await BOT.send_message(text=message, chat_id=rec['userid'])
+        for rec in recs:
+            ind = rec["notified"] - 1
+            message = (
+                f"{random.choice(NOTIFICATIONS[ind][1])} "
+                f"{NOTIFICATIONS[ind][2]}\n"
+                f"#{rec['taskid']} {rec['title']}: "
+                f"{rec['finish'].astimezone().strftime('%a, %d %b %H:%M')}"
+            )
+
+            await BOT.send_message(text=message, chat_id=rec["userid"])
