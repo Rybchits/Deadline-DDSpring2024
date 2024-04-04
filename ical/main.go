@@ -13,8 +13,14 @@ import (
 	"time"
 )
 
+const (
+	fileServerIP   = "178.154.202.11"
+	fileServerPort = "8888"
+)
+
 type icalReq struct {
 	Name  string `json:"name"`
+	Type  string `json:"type"`
 	Tasks []struct {
 		ID          int    `json:"id"`
 		Title       string `json:"title"`
@@ -102,7 +108,15 @@ func makeCalendar(r icalReq) (string, error) {
 	}
 	out := cal.Serialize()
 
-	path := fmt.Sprintf("./calendars/%s.ics", r.Name)
+	var folder string
+	switch r.Type {
+	case "tag":
+		folder = "tags"
+	default:
+		folder = "users"
+	}
+
+	path := fmt.Sprintf("./calendars/%s/%s.ics", folder, r.Name)
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
@@ -110,5 +124,5 @@ func makeCalendar(r icalReq) (string, error) {
 	defer f.Close()
 	f.Write([]byte(out))
 
-	return fmt.Sprintf("http://localhost:8083/%s.ics", r.Name), nil
+	return fmt.Sprintf("http://%s:%s/%s/%s.ics", fileServerIP, fileServerPort, folder, r.Name), nil
 }

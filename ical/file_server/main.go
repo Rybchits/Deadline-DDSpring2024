@@ -10,7 +10,7 @@ func main() {
 
 	http.Handle("/", http.StripPrefix("/", fileServer))
 
-	err := http.ListenAndServe(":8083", nil)
+	err := http.ListenAndServe(":8888", nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %s", err)
 	}
