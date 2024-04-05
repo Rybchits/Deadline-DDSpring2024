@@ -21,7 +21,8 @@ async def tag_task_notifier(task_id: int, tag_id: int, user_id: int, message: st
                 SELECT UsersTags.userId FROM UsersTags
                     LEFT JOIN UsersTasks
                         ON UsersTasks.userId = UsersTags.userId
-                    WHERE tagId = {tag_id} and UsersTasks.done != TRUE and
+                    WHERE tagId = {tag_id} and
+                          (done is NULL or done != TRUE) and
                           UsersTags.userId != {user_id}
                     GROUP BY UsersTags.userId
             """
