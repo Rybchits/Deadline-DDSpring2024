@@ -11,17 +11,18 @@ async def tag_task_notifier(task_id: int, tag_id: int, message: str) -> None:
                 f"SELECT title, finish FROM Tasks WHERE id = {task_id}",
             )
             task_title, date = res[0]["title"], res[0]["finish"]
-            date = date.astimezone().strftime("%a, %d %b %H:%M")
+            date = date.astimezone()
 
-            if date < datetime.now():
+            if date < datetime.now().astimezone():
                 return
 
             users = await conn.fetch(
                 f"""
-                SELECT userId FROM UsersTags
+                SELECT UsersTags.userId FROM UsersTags
                     LEFT JOIN UsersTasks
                         ON UsersTasks.userId = UsersTags.userId
                     WHERE tagId = {tag_id} and UsersTasks.done != TRUE
+                    GROUP BY UsersTags.userId
             """
             )
 

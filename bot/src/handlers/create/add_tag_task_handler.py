@@ -1,12 +1,8 @@
-from datetime import datetime
-import asyncio
 from telegram import (
     Update,
-    ReplyKeyboardMarkup,
-    KeyboardButton,
     InlineKeyboardButton,
-    InlineKeyboardMarkup,
     ReplyKeyboardRemove,
+    InlineKeyboardMarkup,
 )
 
 from telegram.ext import (
@@ -15,48 +11,63 @@ from telegram.ext import (
     MessageHandler,
     ConversationHandler,
     filters,
+    CallbackQueryHandler,
 )
 
 from src.handlers.handlers import cancel_callback
-from src.db.connection import conn
 from src.db.helpers import async_sql
 from src.handlers.notify.tag_notifier import tag_task_notifier
 
 START, ADD_TAG_ID, ADD_TASK_ID = range(3)
 
-async def start_add_tag_task_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+
+async def start_add_tag_task_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
     user_id = update.message.chat_id
-    
-    query = f"""
+
+    sql_query = f"""
         SELECT * from userstags 
         join tags on userstags.tagId = Tags.id
         WHERE userId={user_id} and is_admin=true;
     """
-    user_tags = await async_sql(query)
-
+    user_tags = await async_sql(sql_query)
+    print(user_tags)
     if not user_tags:
-        await update.message.reply_text("У вас нет доступных тэгов для привязки задачи. Заведите его 🙂")
+        await update.message.reply_text(
+            "У вас нет доступных тэгов для привязки задачи. Заведите его 🙂"
+        )
         return ConversationHandler.END
 
     buttons = []
     for i in range(0, len(user_tags), 2):
         pair = []
-        pair.append(InlineKeyboardButton(user_tags[i]['title'], callback_data=user_tags[i]["id"]))
-        if (i + 1 != len(user_tags)):
-            pair.append(InlineKeyboardButton(user_tags[i + 1]['title'], callback_data=user_tags[i + 1]["id"]))
+        pair.append(
+            InlineKeyboardButton(
+                user_tags[i]["title"], callback_data=user_tags[i]["id"]
+            )
+        )
+        if i + 1 != len(user_tags):
+            pair.append(
+                InlineKeyboardButton(
+                    user_tags[i + 1]["title"], callback_data=user_tags[i + 1]["id"]
+                )
+            )
         buttons.append(pair)
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
 
-    await update.message.reply_text("Выберите предмет", reply_markup=reply_markup)
-    await update.message.reply_text("Укажите тэг, к которому вы хотите привязать задачу: 🏷️", reply_markup=reply_markup)
+    await update.effective_message.reply_text(
+        "Укажите тэг, к которому вы хотите привязать задачу: 🏷️",
+        reply_markup=reply_markup,
+    )
 
     return ADD_TAG_ID
 
-async def add_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    tag_name = update.message.text
-    user_id = update.message.chat_id
 
+async def add_tag_id_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
     query = update.callback_query
 
     await context.bot.edit_message_text(
@@ -71,65 +82,91 @@ async def add_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
         reply_markup=ReplyKeyboardRemove(),
     )
 
-    # query = f'SELECT id from TAGS where title={tag_name};'
-    # tag_id = await async_sql(query)
-    # tag_id = tag_id[0]["id"]
-
     tag_id = int(query.data)
     context.user_data["TAG_ID"] = tag_id
 
-    query = f"SELECT is_admin from userstags WHERE userId={user_id} and tagId={tag_id};"
-    result = await async_sql(query)
+    user_id = query.message.chat_id
 
-    if not result or not result[0]["is_admin"]:
-        await update.message.reply_text("Вы не можете добавить задачу в этот тег. Вы не являетесь его админом 😟")
+    sql_query = f"""
+        SELECT Tasks.id, Tasks.title FROM UsersTasks
+            JOIN Tasks ON UsersTasks.taskId = Tasks.id and UsersTasks.userId = {user_id}
+            LEFT JOIN TagsTasks ON TagsTasks.taskId = Tasks.id and TagsTasks.tagId={tag_id}
+        WHERE tagstasks.tagId IS NULL;
+    """
+    tasks = await async_sql(sql_query)
+    print(tasks)
+    if not tasks:
+        await query.message.reply_text(
+            "У вас нет доступных для привязки задач. Заведите их 🙂"
+        )
         return ConversationHandler.END
-    
-    await update.message.reply_text("Введите название задачи: 📚")
+
+    buttons = []
+    for i in range(0, len(tasks), 2):
+        pair = []
+        pair.append(
+            InlineKeyboardButton(tasks[i]["title"], callback_data=tasks[i]["id"])
+        )
+        if i + 1 != len(tasks):
+            pair.append(
+                InlineKeyboardButton(
+                    tasks[i + 1]["title"], callback_data=tasks[i + 1]["id"]
+                )
+            )
+        buttons.append(pair)
+
+    reply_markup = InlineKeyboardMarkup(buttons)
+
+    await update.effective_message.reply_text(
+        "Укажите задачу, которую вы хотите привязать тег: 🏷️", reply_markup=reply_markup
+    )
 
     return ADD_TASK_ID
 
-async def add_task_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    task_name = update.message.text
+
+async def add_task_id_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
+    query = update.callback_query
+
+    await context.bot.edit_message_text(
+        text=query.message.text,
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id,
+    )
+
+    await context.bot.send_message(
+        chat_id=update.callback_query.from_user.id,
+        text=query.data,
+        reply_markup=ReplyKeyboardRemove(),
+    )
+
+    task_id = int(query.data)
     tag_id = context.user_data["TAG_ID"]
 
-    # TODO: move into transaction
-
-    query = f"SELECT id from tasks WHERE title={task_name};"
-    task_id = await async_sql(query)
-
-    check_task_query = f"SELECT * from tasks WHERE id={task_id};"
-    result = await async_sql(check_task_query)
-
-    if not result:
-        await update.message.reply_text(f'Задачи {task_name} не существует 🥲')
-        return ConversationHandler.END
-
-    insert_query = f"INSERT INTO TagsTasks(tagId, taskId) values ({tag_id}, {task_id});"
-    await async_sql(insert_query)
+    sql_query = f"INSERT INTO TagsTasks(tagId, taskId) values ({tag_id}, {task_id});"
+    await async_sql(sql_query)
 
     await tag_task_notifier(
         task_id,
         tag_id,
-        'Новая задача #{task_id} {task_title} '
-        'в тэге #{tag_id} {tag_title}: {date} ✅',
+        "Новый дедлайн #{task_id} {task_title} " "в тэге #{tag_id} {tag_title}: {date}",
     )
 
     return ConversationHandler.END
+
 
 def add_tag_task_builder() -> ConversationHandler:
     return ConversationHandler(
         entry_points=[CommandHandler("add_tag_task", start_add_tag_task_callback)],
         states={
-            ADD_TASK_ID: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, add_task_id_callback)
-            ],
-            ADD_TAG_ID: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, add_tag_id_callback)
-            ],
+            ADD_TAG_ID: [CallbackQueryHandler(add_tag_id_callback)],
+            ADD_TASK_ID: [CallbackQueryHandler(add_task_id_callback)],
             START: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, start_add_tag_task_callback)
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND, start_add_tag_task_callback
+                )
             ],
         },
-        fallbacks=[CommandHandler("cancel", cancel_callback)]
+        fallbacks=[CommandHandler("cancel", cancel_callback)],
     )
