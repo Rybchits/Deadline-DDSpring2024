@@ -32,7 +32,6 @@ async def start_add_tag_task_callback(
         WHERE userId={user_id} and is_admin=true;
     """
     user_tags = await async_sql(sql_query)
-    print(user_tags)
     if not user_tags:
         await update.message.reply_text(
             "У вас нет доступных тэгов для привязки задачи. Заведите его 🙂"
@@ -94,7 +93,6 @@ async def add_tag_id_callback(
         WHERE tagstasks.tagId IS NULL;
     """
     tasks = await async_sql(sql_query)
-    print(tasks)
     if not tasks:
         await query.message.reply_text(
             "У вас нет доступных для привязки задач. Заведите их 🙂"
