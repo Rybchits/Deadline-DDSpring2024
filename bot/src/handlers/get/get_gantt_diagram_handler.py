@@ -26,7 +26,7 @@ def build_gantt_chart(user_id: str, tasks: List):
 
     path=f'./charts/user_chart_{user_id}'
 
-    project = gantt.Project(color="#FFFF00")
+    project = gantt.Project(color="#FFA500")
     for task in tasks:
         project.add_task(gantt.Task(name=task[0], start=datetime.date(task[1]), stop=datetime.date(task[2])))
 

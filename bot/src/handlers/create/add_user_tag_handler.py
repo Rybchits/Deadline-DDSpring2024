@@ -62,12 +62,6 @@ async def add_tag_id_callback(
         message_id=query.message.message_id,
     )
 
-    await context.bot.send_message(
-        chat_id=update.callback_query.from_user.id,
-        text=query.data,
-        reply_markup=ReplyKeyboardRemove(),
-    )
-
     tag_id = int(query.data)
     user_id = query.message.chat_id
 
@@ -81,7 +75,7 @@ async def add_tag_id_callback(
     """
     await async_sql(sql_query)
 
-    await query.message.reply_text(f"Вы успешно подписались на тэг {tag_title}! 🎉")
+    await query.message.reply_text(f"Вы успешно подписались на тэг {tag_title}! 🎉", reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
 

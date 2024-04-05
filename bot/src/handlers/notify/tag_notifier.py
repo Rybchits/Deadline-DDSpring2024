@@ -4,7 +4,7 @@ from src.db.connection import POOL
 from src.handlers.bot import BOT
 
 
-async def tag_task_notifier(task_id: int, tag_id: int, message: str) -> None:
+async def tag_task_notifier(task_id: int, tag_id: int, user_id: int, message: str) -> None:
     async with POOL[0].acquire() as conn:
         async with conn.transaction():
             res = await conn.fetch(
@@ -21,7 +21,8 @@ async def tag_task_notifier(task_id: int, tag_id: int, message: str) -> None:
                 SELECT UsersTags.userId FROM UsersTags
                     LEFT JOIN UsersTasks
                         ON UsersTasks.userId = UsersTags.userId
-                    WHERE tagId = {tag_id} and UsersTasks.done != TRUE
+                    WHERE tagId = {tag_id} and UsersTasks.done != TRUE and
+                          UsersTags.userId != {user_id}
                     GROUP BY UsersTags.userId
             """
             )

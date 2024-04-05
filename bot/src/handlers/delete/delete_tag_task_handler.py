@@ -48,6 +48,7 @@ async def delete_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_T
     return DELETE_TASK_ID
 
 async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = update.message.chat_id
     task_name = update.message.text
     query = "SELECT title from tasks WHERE id=%s;"
     task_id = run_sql(query, (task_name,))
@@ -60,6 +61,7 @@ async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_
     await tag_task_notifier(
         task_id,
         tag_id,
+        user_id,
         'Освобождение от дедлайна #{task_id} {task_title} '
         'в тэге #{tag_id} {tag_title}: {date} 🥲',
     )

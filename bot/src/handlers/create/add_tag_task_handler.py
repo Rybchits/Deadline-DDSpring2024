@@ -75,12 +75,6 @@ async def add_tag_id_callback(
         message_id=query.message.message_id,
     )
 
-    await context.bot.send_message(
-        chat_id=update.callback_query.from_user.id,
-        text=query.data,
-        reply_markup=ReplyKeyboardRemove(),
-    )
-
     tag_id = int(query.data)
     context.user_data["TAG_ID"] = tag_id
 
@@ -126,17 +120,12 @@ async def add_task_id_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
     query = update.callback_query
+    user_id = query.message.chat_id
 
     await context.bot.edit_message_text(
         text=query.message.text,
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
-    )
-
-    await context.bot.send_message(
-        chat_id=update.callback_query.from_user.id,
-        text=query.data,
-        reply_markup=ReplyKeyboardRemove(),
     )
 
     task_id = int(query.data)
@@ -145,9 +134,12 @@ async def add_task_id_callback(
     sql_query = f"INSERT INTO TagsTasks(tagId, taskId) values ({tag_id}, {task_id});"
     await async_sql(sql_query)
 
+    await query.message.reply_text(f"Задача добавлена к тэгу! 🎉", reply_markup=ReplyKeyboardRemove())
+
     await tag_task_notifier(
         task_id,
         tag_id,
+        user_id,
         "Новый дедлайн #{task_id} {task_title} " "в тэге #{tag_id} {tag_title}: {date}",
     )
 
