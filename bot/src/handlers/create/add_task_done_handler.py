@@ -99,7 +99,7 @@ async def add_task_id_callback(
     )
     await async_sql(query, (user_id, task_id))
 
-    await update.effective_message.reply_text(f"Задача {task_id} выполнена! 🕺")
+    await update.effective_message.reply_text(f"Задача {task_name} выполнена! 🕺")
 
     return ConversationHandler.END
 
