@@ -18,7 +18,7 @@ from telegram.ext import (
 from src.calendar import create_calendar, process_calendar_selection
 
 from src.handlers.handlers import cancel_callback
-from src.db.helpers import async_sql
+from src.db.helpers import async_sql, run_sql
 
 
 START, ADD_TASK_NAME, ADD_TASK_END_TIME, ADD_TASK_END_DATE = range(4)
@@ -34,7 +34,8 @@ async def start_add_task_callback(
 async def add_task_name_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
-    context.user_data["TITLE"] = update.message.text
+    task_name = update.message.text
+    context.user_data["TITLE"] = task_name
 
     context.user_data["START"] = datetime.now()
 
@@ -130,6 +131,11 @@ async def add_task_end_time_callback(
     task_id = await async_sql(
         insert_query, (task["TITLE"], task["START"], task["FINISH"], user_id)
     )
+
+    if not task_id:
+        await context.bot.send_message(chat_id=user_id, text=f'Задача с названием {task["TITLE"]} уже существует.')
+        return ConversationHandler.END
+
     task_id = task_id[0]["taskid"]
 
     await context.bot.send_message(

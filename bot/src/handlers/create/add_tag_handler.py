@@ -35,6 +35,11 @@ async def add_tag_title_callback(update: Update, context: ContextTypes.DEFAULT_T
     """
 
     tag_id = await async_sql(insert_tag_query)
+
+    if not tag_id:
+        await context.bot.send_message(chat_id=user_id, text=f'Тэг с названием {title} уже существует.')
+        return ConversationHandler.END
+
     tag_id = tag_id[0]['tagid']
 
     await update.message.reply_text(f'Тэг {title} успешно создан! 🕺')
