@@ -22,19 +22,19 @@ START = range(1)
 
 # Строит диаграмму Ганта на две недели вперед
 def build_gantt_chart(user_id: str, tasks: List):
-    gantt.define_font_attributes(fill='black', stroke='black', stroke_width=0, font_family="Verdana")
+    gantt.define_font_attributes(fill='black', stroke='black', stroke_width=0, font_family="CenturyGothic")
 
     path=f'./charts/user_chart_{user_id}'
 
-    project = gantt.Project()
+    project = gantt.Project(color="#FFFF00")
     for task in tasks:
         project.add_task(gantt.Task(name=task[0], start=datetime.date(task[1]), stop=datetime.date(task[2])))
 
     project.make_svg_for_tasks(
         filename=path + '.svg',
         today=datetime.today(), 
-        start=(datetime.today() - timedelta(days=1)).date(), 
-        end=(datetime.today() + timedelta(days=14)).date())
+        start=(datetime.today() - timedelta(days=10)).date(), 
+        end=(datetime.today() + timedelta(days=31)).date())
     
     svg2png(url=path + '.svg', write_to=path + '.png')
 
