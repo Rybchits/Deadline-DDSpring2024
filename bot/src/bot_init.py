@@ -55,6 +55,7 @@ def bot_start() -> None:
 
     application.add_handler(CommandHandler("start", start_callback))
     application.add_handler(CommandHandler("help", help_callback))
+    application.add_handler(CommandHandler("cancel", cancel_callback))
 
     # Create
     application.add_handler(add_task_builder())
@@ -90,13 +91,13 @@ def bot_start() -> None:
             BotCommand("add_tag", "Добавить тэг"),
             BotCommand("tag_subscribe", "Подписаться на тэг"),
             BotCommand("task_subscribe", "Подписаться на задачу"),
-            BotCommand("add_tag_task", "Добавить TagsTasks"),
+            BotCommand("add_tag_task", "Добавить задачу к тэгу"),
 
             BotCommand("do_task", "Выполнить задачу"),
 
             BotCommand("delete_tag", "Удалить тэг"),
             BotCommand("delete_task", "Удалить задачу"),
-            BotCommand("delete_tag_task", "Удалить TagsTasks"),
+            BotCommand("delete_tag_task", "Удалить задачу из тэга"),
             BotCommand("tag_unsubscribe", "Отписаться от тэга"),
             BotCommand("task_unsubscribe", "Описаться от задачи"),
 
@@ -104,6 +105,8 @@ def bot_start() -> None:
             BotCommand("get_tasks", "Получить все задачи"),
 
             BotCommand("get_ical", "Создать календарь"),
+            
+            BotCommand("cancel", "Галя, у нас отмена"),
         ]
     )
 

@@ -37,7 +37,7 @@ async def add_tag_title_callback(update: Update, context: ContextTypes.DEFAULT_T
     tag_id = await async_sql(insert_tag_query)
     tag_id = tag_id[0]['tagid']
 
-    await update.message.reply_text(f'Тэг {title} с идентификатором {tag_id}')
+    await update.message.reply_text(f'Тэг {title} успешно создан! 🕺')
 
     return ConversationHandler.END
 

@@ -60,6 +60,6 @@ async def help_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 /get_ical: Получить ссылку на календарь для синхронизации и легкости в планировании. 📅
                                     """
                                     )
-
+    
 async def cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return ConversationHandler.END

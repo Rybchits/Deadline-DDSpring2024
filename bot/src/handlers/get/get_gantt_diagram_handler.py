@@ -50,6 +50,7 @@ async def start_get_gantt_diagram_callback(update: Update, context: ContextTypes
         return ConversationHandler.END
     
     build_gantt_chart(chat_id, tasks)
+    await update.message.reply_text("Мистер Гантт к вашим услугам! 🙇")
     await context.bot.send_photo(chat_id, photo=open(f'./charts/user_chart_{chat_id}.png', 'rb'))
 
     return ConversationHandler.END

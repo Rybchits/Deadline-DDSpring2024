@@ -134,7 +134,7 @@ async def add_task_end_time_callback(
 
     await context.bot.send_message(
         chat_id=user_id,
-        text=f'Задача {task["TITLE"]} с номером {task_id} успешно создана! 🕺',
+        text=f'Задача {task["TITLE"]} успешно создана! 🕺',
     )
 
     return ConversationHandler.END

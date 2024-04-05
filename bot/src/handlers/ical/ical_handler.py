@@ -38,6 +38,7 @@ async def start_get_ical_callback(update: Update, context: ContextTypes.DEFAULT_
     
     response = requests.post("http://localhost:8082/ical", json=ical_request_data)
     if response.status_code == 200:
+        await update.message.reply_text("Добавь к себе в календарь: 📆")
         await context.bot.send_document(user_id, document=open(f'./ical/calendars/{user_id}.ics', 'rb'))
     else:
         await update.message.reply_text("Не удалось получить данные с сервера. 😟")
