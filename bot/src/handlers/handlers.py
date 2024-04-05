@@ -62,4 +62,6 @@ async def help_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
                                     )
     
 async def cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await context.bot.send_photo(update.message.chat_id, photo='https://gubdaily.ru/wp-content/uploads/2020/09/galya.jpg')
+    
     return ConversationHandler.END
