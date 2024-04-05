@@ -27,7 +27,7 @@ START, ADD_TASK_NAME, ADD_TASK_END_TIME, ADD_TASK_END_DATE = range(4)
 async def start_add_task_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
-    await update.message.reply_text("Введите название задачи:")
+    await update.message.reply_text("Введите название задачи: 📝")
     return ADD_TASK_NAME
 
 
@@ -39,7 +39,7 @@ async def add_task_name_callback(
     context.user_data["START"] = datetime.now()
 
     await update.effective_message.reply_text(
-        text="Введите дату окончания задачи\t\t\t", reply_markup=create_calendar()
+        text="Введите дедлайн задачи: 📆\t\t\t", reply_markup=create_calendar()
     )
 
     return ADD_TASK_END_DATE
@@ -54,7 +54,7 @@ async def add_task_end_date_callback(
     if selected:
         await context.bot.send_message(
             chat_id=user_id,
-            text=f"Дата окончания выбрана: {date.strftime('%d/%m/%Y')}",
+            text=f"Дедлайн установлен: {date.strftime('%d/%m/%Y')} ✅",
             reply_markup=ReplyKeyboardRemove(),
         )
 
@@ -74,7 +74,7 @@ async def add_task_end_date_callback(
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.effective_message.reply_text(
-        "Введите время окончания задачи:", reply_markup=reply_markup
+        "Введите время дедлайна: 🕐", reply_markup=reply_markup
     )
 
     return ADD_TASK_END_TIME
@@ -100,7 +100,7 @@ async def add_task_end_time_callback(
 
     await context.bot.send_message(
         chat_id=update.callback_query.from_user.id,
-        text=f"Дата выбрана: {date.strftime('%d/%m/%Y %H:%M')}",
+        text=f"Время установлено: {date.strftime('%d/%m/%Y %H:%M')} 📆",
         reply_markup=ReplyKeyboardRemove(),
     )
 
@@ -108,10 +108,10 @@ async def add_task_end_time_callback(
         await context.bot.send_message(
             chat_id=user_id,
             text="Вы не можете решить задачу в прошлом, "
-            "постарайтесь жить сейчас и думать о будущем",
+            "постарайтесь жить сейчас и думать о будущем!",
         )
         await update.effective_message.reply_text(
-            text="Введите дату окончания задачи\t\t\t", reply_markup=create_calendar()
+            text="Введите дедлайн задачи: 📆\t\t\t", reply_markup=create_calendar()
         )
         return ADD_TASK_END_DATE
 
@@ -134,7 +134,7 @@ async def add_task_end_time_callback(
 
     await context.bot.send_message(
         chat_id=user_id,
-        text=f'Создана задача {task["TITLE"]} с идентификатором {task_id}',
+        text=f'Задача {task["TITLE"]} с номером {task_id} успешно создана! 🕺',
     )
 
     return ConversationHandler.END

@@ -54,6 +54,7 @@ def bot_start() -> None:
     application = Application.builder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start_callback))
+    application.add_handler(CommandHandler("help", help_callback))
 
     # Create
     application.add_handler(add_task_builder())
@@ -83,6 +84,7 @@ def bot_start() -> None:
         application,
         [
             BotCommand("start", "Начать"),
+            BotCommand("help", "Помогите"),
 
             BotCommand("add_task", "Добавить задачу"),
             BotCommand("add_tag", "Добавить тэг"),

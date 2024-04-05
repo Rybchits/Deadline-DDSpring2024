@@ -16,7 +16,7 @@ START, ADD_TASK_ID = range(2)
 async def start_add_user_task_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
-    await update.message.reply_text("Введите название задачи:")
+    await update.message.reply_text("Введите название задачи: 📚")
 
     return ADD_TASK_ID
 
@@ -31,7 +31,7 @@ async def add_task_id_callback(
     result = await async_sql(query, (task_name,))
 
     if not result:
-        await update.message.reply_text("Введенная задача не существует.")
+        await update.message.reply_text("Введенная задача не существует 😟")
         return ConversationHandler.END
 
     task_id = result[0]["id"]
@@ -41,7 +41,7 @@ async def add_task_id_callback(
     """
     await async_sql(query)
 
-    await update.message.reply_text(f"Вы успешно подписались на задачу {task_name}!")
+    await update.message.reply_text(f"Вы успешно подписались на задачу {task_name}! 🥳")
 
     return ConversationHandler.END
 

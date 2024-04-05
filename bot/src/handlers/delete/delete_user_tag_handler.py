@@ -22,7 +22,7 @@ START, DELETE_TAG_ID = range(2)
 
 async def start_delete_user_tag_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["USER_ID"] = update.message.chat_id
-    await update.message.reply_text("Введите название тэга:")
+    await update.message.reply_text("Введите название тэга: 🏷️")
 
     return DELETE_TAG_ID
 
@@ -34,7 +34,7 @@ async def delete_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_T
     result = run_sql(query, (tag_name,))
 
     if not result:
-        await update.message.reply_text("Введенный тэг не существует.")
+        await update.message.reply_text("Введенный тэг не существует. 😟")
         return ConversationHandler.END
 
     tag_id = result[0][0]
@@ -42,7 +42,7 @@ async def delete_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_T
     query = "DELETE FROM UsersTags WHERE userId=%s AND tagId=%s;"
     run_sql(query, (user_id, tag_id))
 
-    await update.message.reply_text(f'Вы успешно отписались от тэга {tag_name}!')
+    await update.message.reply_text(f'Вы успешно отписались от тэга {tag_name}! 🥳')
 
     return ConversationHandler.END
 

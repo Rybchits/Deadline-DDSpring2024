@@ -17,7 +17,7 @@ async def start_add_user_tag_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> int:
     context.user_data["USER_ID"] = update.message.chat_id
-    await update.message.reply_text("Введите название тэга:")
+    await update.message.reply_text("Введите название тэга: 🏷️")
 
     return ADD_TAG_ID
 
@@ -32,7 +32,7 @@ async def add_tag_id_callback(
     result = await async_sql(query, (tag_name,))
 
     if not result:
-        await update.message.reply_text("Введенный тэг не существует.")
+        await update.message.reply_text("Введенный тэг не существует! 😟")
         return ConversationHandler.END
 
     tag_id = result[0]["id"]
@@ -43,7 +43,7 @@ async def add_tag_id_callback(
     """
     await async_sql(query)
 
-    await update.message.reply_text(f"Вы успешно подписались на тэг {tag_name}!")
+    await update.message.reply_text(f"Вы успешно подписались на тэг {tag_name}! 🎉")
 
     return ConversationHandler.END
 

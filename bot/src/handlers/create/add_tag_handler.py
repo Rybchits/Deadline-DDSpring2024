@@ -16,7 +16,7 @@ from src.db.helpers import async_sql
 START, ADD_TAG_NAME = range(2)
 
 async def start_add_tag_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("Введите название тэга:")
+    await update.message.reply_text("Введите название тэга: 🏷️")
     return ADD_TAG_NAME
 
 # Каждый user, который добавляет тег становится его админом
@@ -37,7 +37,7 @@ async def add_tag_title_callback(update: Update, context: ContextTypes.DEFAULT_T
     tag_id = await async_sql(insert_tag_query)
     tag_id = tag_id[0]['tagid']
 
-    await update.message.reply_text(f'Создан тэг {title} с идентификатором {tag_id}')
+    await update.message.reply_text(f'Тэг {title} с идентификатором {tag_id}')
 
     return ConversationHandler.END
 

@@ -21,7 +21,7 @@ from src.db.helpers import run_sql
 START, DELETE_TASK_ID = range(2)
 
 async def start_delete_user_task_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("Введите название задачи:")
+    await update.message.reply_text("Введите название задачи: 📚")
     context.user_data["USER_ID"] = update.message.chat_id
 
     return DELETE_TASK_ID
@@ -34,7 +34,7 @@ async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_
     result = run_sql(query, (task_name,))
 
     if not result:
-        await update.message.reply_text("Введенная задача не существует.")
+        await update.message.reply_text("Введенная задача не существует. 😟")
         return ConversationHandler.END
 
     task_id = result[0][0]
@@ -42,7 +42,7 @@ async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_
     query = "DELETE FROM UsersTasks WHERE userId=%s AND taskId=%s;"
     run_sql(query, (user_id, task_id))
 
-    await update.message.reply_text(f'Вы успешно отписались от задачи {task_name}!')
+    await update.message.reply_text(f'Вы успешно отписались от задачи {task_name}! ✅')
 
     return ConversationHandler.END
 

@@ -46,7 +46,7 @@ async def start_get_gantt_diagram_callback(update: Update, context: ContextTypes
     tasks = run_sql(query, (chat_id, chat_id))
 
     if not tasks:
-        await update.message.reply_text("У вас нет активных задач.")
+        await update.message.reply_text("У вас нет активных задач. 🥳")
         return ConversationHandler.END
     
     build_gantt_chart(chat_id, tasks)

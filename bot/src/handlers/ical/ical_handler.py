@@ -20,7 +20,7 @@ async def start_get_ical_callback(update: Update, context: ContextTypes.DEFAULT_
     tasks = run_sql(query, (user_id, user_id))
 
     if not tasks:
-        await update.message.reply_text("У вас нет активных задач.")
+        await update.message.reply_text("У вас нет активных задач. 🕺🏻")
         return ConversationHandler.END
 
     ical_request_data = {
@@ -40,8 +40,7 @@ async def start_get_ical_callback(update: Update, context: ContextTypes.DEFAULT_
     if response.status_code == 200:
         await context.bot.send_document(user_id, document=open(f'./ical/calendars/{user_id}.ics', 'rb'))
     else:
-        print(response.status_code)
-        await update.message.reply_text("Не удалось получить данные с сервера.")
+        await update.message.reply_text("Не удалось получить данные с сервера. 😟")
 
     return ConversationHandler.END
 

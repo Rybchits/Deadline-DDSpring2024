@@ -29,21 +29,29 @@ async def start_delete_tag_task_callback(update: Update, context: ContextTypes.D
     result = run_sql(query, (user_id,))
 
     if not result or result[0][0] != 'admin':
-        await update.message.reply_text("Вы не можете удалять задачи из тэгов.")
+        await update.message.reply_text("Вы не достаточно всемогущ, чтобы делать это! 😟")
         return ConversationHandler.END
     
-    await update.message.reply_text("Введите tag id:")
+    await update.message.reply_text("Введите название тэга: 🏷️")
 
     return DELETE_TAG_ID
 
 async def delete_tag_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data["TAG_ID"] = update.message.text
-    await update.message.reply_text("Введите task id:")
+    tag_name = update.message.text
+    
+    query = "SELECT id from tags WHERE title=%s;"
+    tag_id = run_sql(query, (tag_name,))
+
+    context.user_data["TAG_ID"] = tag_id
+    await update.message.reply_text("Введите название задачи: 📚")
 
     return DELETE_TASK_ID
 
 async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    task_id = update.message.text
+    task_name = update.message.text
+    query = "SELECT title from tasks WHERE id=%s;"
+    task_id = run_sql(query, (task_name,))
+
     tag_id = context.user_data["TAG_ID"]
 
     query = "DELETE FROM TagsTasks WHERE tagId=%s AND taskId=%s;"
@@ -53,7 +61,7 @@ async def delete_task_id_callback(update: Update, context: ContextTypes.DEFAULT_
         task_id,
         tag_id,
         'Освобождение от дедлайна #{task_id} {task_title} '
-        'в тэге #{tag_id} {tag_title}: {date}',
+        'в тэге #{tag_id} {tag_title}: {date} 🥲',
     )
 
     return ConversationHandler.END
