@@ -4,7 +4,7 @@ import os
 
 load_dotenv()
 
-HOST = "178.154.202.11"
+HOST = "84.201.156.227"
 DATABASE = "deadline-db"
 USER = "admin"
 PASSWORD = os.getenv("PSQL_PASSWORD")
