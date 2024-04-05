@@ -56,3 +56,6 @@ ALTER TABLE TagsTasks ADD FOREIGN KEY (taskId) REFERENCES Tasks (id);
 ALTER TABLE UsersTags ADD FOREIGN KEY (tagId) REFERENCES Tags (id);
 
 --ALTER TABLE UsersTags ADD FOREIGN KEY (userId) REFERENCES Users (id);
+
+ALTER TABLE tasks ADD UNIQUE (title);
+ALTER TABLE tags ADD UNIQUE (title);
